@@ -47,9 +47,9 @@ class DFPMetadata(BaseModel):
 class Chunk(BaseModel):
     """Modelo de dados para um chunk de texto extraído de um relatório financeiro."""
     chunk_id: str = Field(description="Identificador único do chunk")
-    text: str = Field(min_length=10, description="Texto do chunk, mínimo 10 caracteres")
-    page_number: int = Field(ge=1, description="Número da página de onde o chunk foi extraído")
-    section: DocumentSection = Field(description="Seção do relatório a que o chunk pertence")
+    texto: str = Field(min_length=10, description="Texto do chunk, mínimo 10 caracteres")
+    numero_pagina: int = Field(ge=1, description="Número da página de onde o chunk foi extraído")
+    secao: DocumentSection = Field(description="Seção do relatório a que o chunk pertence")
     chunk_type: Literal["text", "table", "title"] = Field(description="Tipo do chunk: texto, tabela ou título")
     char_count: int = Field(ge=10, description="Número de caracteres no chunk, mínimo 10")
     document_metadata: DFPMetadata = Field(description="Metadados do documento de onde o chunk foi extraído")
@@ -57,9 +57,9 @@ class Chunk(BaseModel):
     def qdrant_payload(self) -> dict:
         """Gera o payload a ser enviado para o Qdrant, combinando o texto do chunk com os metadados do documento."""
         return {
-            "text": self.text,
-            "page_number": self.page_number,
-            "section": self.section.value,
+            "texto": self.texto,
+            "numero_pagina": self.numero_pagina,
+            "secao": self.secao.value,
             "chunk_type": self.chunk_type,
             "nome_empresa": self.document_metadata.nome_empresa,
             "cnpj": self.document_metadata.cnpj,
@@ -74,9 +74,9 @@ class Chunk(BaseModel):
     def payload_indexes(cls) -> list[str]:
         """Retorna a lista de chaves do payload que devem ser indexadas no Qdrant."""
         return [
-            "text",
-            "page_number",
-            "section",
+            "texto",
+            "número da página",
+            "secao",
             "chunk_type",
             "nome_empresa",
             "cnpj",
@@ -85,8 +85,4 @@ class Chunk(BaseModel):
             "ano_fiscal",
             "trimestre",
             "ano_publicacao"
-        ]
-
-
-
-    
+        ]  
