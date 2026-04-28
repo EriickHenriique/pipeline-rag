@@ -17,26 +17,26 @@ class RetrievalFilters(BaseModel):
     nome_empresa: list[str] = Field(default_factory=list, description="Lista de nomes de empresas para filtrar os chunks")
     anos_fiscais: list[int] = Field(default_factory=list, description="Lista de anos fiscais para filtrar os chunks")
     trimestres: list[Literal[1, 2, 3, 4]] = Field(default_factory=list, description="Lista de trimestres para filtrar os chunks")
-    seções: list[str] = Field(default_factory=list, description="Lista de seções do relatório para filtrar os chunks, ex: 'Demonstração de Resultados', 'Balanço Patrimonial'")
+    secoes: list[str] = Field(default_factory=list, description="Lista de seções do relatório para filtrar os chunks, ex: 'Demonstração de Resultados', 'Balanço Patrimonial'")
 
 class QueryPlan(BaseModel):
     """Plano de consulta gerado a partir da pergunta do usuário, contendo a intenção identificada, a pergunta reformulada para otimizar a recuperação de chunks relevantes, e os filtros de recuperação baseados nos metadados dos documentos."""
-    original_query: str = Field(description="Pergunta original do usuário")
-    intent: QueryIntent = Field(description="Intenção de consulta identificada a partir da pergunta do usuário")
-    rephrased_query: str = Field(description="Pergunta reformulada para otimizar a recuperação de chunks relevantes")
-    filters: RetrievalFilters = Field(description="Filtros de recuperação para refinar a busca por chunks relevantes no Qdrant")
-    expected_kpis: list[str] = Field(default_factory=list, description="Lista de KPIs esperados na resposta, se aplicável")
+    query_original: str = Field(description="Pergunta original do usuário")
+    intencao: QueryIntent = Field(description="Intenção de consulta identificada a partir da pergunta do usuário")
+    query_reformulada: str = Field(description="Pergunta reformulada para otimizar a recuperação de chunks relevantes")
+    filtros: RetrievalFilters = Field(description="Filtros de recuperação para refinar a busca por chunks relevantes no Qdrant")
+    indicadores_esperados: list[str] = Field(default_factory=list, description="Lista de KPIs esperados na resposta, se aplicável")
     needs_clarification: bool = False
     clarrification_message: str | None = None  
 
 class RetrievedChunk(BaseModel):
     """Modelo de dados para um chunk recuperado do Qdrant, contendo o texto do chunk e os metadados associados."""
     chunk_id: str = Field(description="Identificador único do chunk")
-    text: str = Field(description="Texto do chunk recuperado")
+    texto: str = Field(description="Texto do chunk recuperado")
     score: float = Field(ge=0.0, le=1.0, description="Pontuação de relevância do chunk em relação à consulta")
     nome_empresa: str = Field(description="Nome da empresa associada ao chunk")
     ano_fiscal: int = Field(description="Ano fiscal associado ao chunk")
     trimestre: Literal[1, 2, 3, 4] | None = Field(description="Trimestre associado ao chunk")
-    section: str = Field(description="Seção do relatório associada ao chunk, ex: 'Demonstração de Resultados', 'Balanço Patrimonial'")
-    page_number: int = Field(description="Número da página de onde o chunk foi extraído")
+    secao: str = Field(description="Seção do relatório associada ao chunk, ex: 'Demonstração de Resultados', 'Balanço Patrimonial'")
+    numero_pagina: int = Field(description="Número da página de onde o chunk foi extraído")
     chunk_type: Literal["text", "table", "title"] = Field(description="Tipo do chunk: texto, tabela ou título")
