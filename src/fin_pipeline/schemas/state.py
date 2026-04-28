@@ -1,8 +1,8 @@
 from operator import add
 from typing import Annotated, TypedDict
 
-from agent.schemas.analysis import FinancialAnalysis
-from agent.schemas.query import QueryPlan, RetrievedChunk
+from fin_pipeline.schemas.analysis import FinancialAnalysis
+from fin_pipeline.schemas.query import QueryPlan, RetrievedChunk
 
 class AgentState(TypedDict):
     """Estado do agente durante o processo de análise financeira, contendo a pergunta original do usuário, 
