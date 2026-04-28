@@ -48,8 +48,8 @@ class DFPParser:
         tables = []        
         for table in doc.tables:
             tables.append({
-                "pagina": table.prov[0].page_no if table.prov else None,
-                "conteudo": table.export_to_dataframe().to_dict(orient="records"),
+                "page": table.prov[0].page_no if table.prov else None,
+                "content": table.export_to_dataframe().to_dict(orient="records"),
                 "markdown": table.export_to_markdown()
             })
         

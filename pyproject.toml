@@ -1,5 +1,5 @@
 [project]
-name = "pipeline-rag"
+name = "pipeline-rag-financial-analyst"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "docling[ocr]>=2.90.0",
     "easyocr>=1.7.2",
+    "loguru>=0.7.3",
     "rapidocr-onnxruntime>=1.4.4",
 ]
