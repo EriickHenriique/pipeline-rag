@@ -10,7 +10,7 @@ class QueryIntent(str, Enum):
     TREND_ANALYSIS = "trend_analysis" # Análise de tendências ao longo do tempo
     SUMMARY = "summary" # Resumo geral do desempenho financeiro
     EXPLANATION = "explanation" # Explicação de um resultado ou variação
-    UKNOWN = "unknown" # Intenção desconhecida ou não classificada
+    UNKNOWN = "unknown" # Intenção desconhecida ou não classificada
 
 class RetrievalFilters(BaseModel):
     """Filtros opcionais para refinar a busca por chunks relevantes no Qdrant, com base nos metadados dos documentos."""

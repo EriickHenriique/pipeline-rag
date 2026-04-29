@@ -25,7 +25,7 @@ class DFPMetadata(BaseModel):
     nome_empresa: str = Field(min_length=2, max_length=200, description="Nome da empresa")
     cnpj: str = Field(pattern=r"^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$", description="CNPJ da empresa")
     ticker: str | None = Field(default=None, min_length=1, max_length=10, description="Ticker da empresa")
-    tipo_relatorio = ReportType = Field(description="Tipo de relatório financeiro")
+    tipo_relatorio: ReportType = Field(description="Tipo de relatório financeiro")
     ano_fiscal: int = Field(ge=2010, le=2030, description="Ano fiscal do relatório")
     trimestre: Literal[1, 2, 3, 4] | None = Field(default=None, description="Trimestre do relatório")
     data_publicacao: datetime | None = Field(description="Data de publicação do relatório")

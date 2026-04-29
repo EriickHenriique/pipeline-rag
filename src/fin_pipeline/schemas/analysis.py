@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 class KPI(BaseModel):
     """Modelo de dados para um KPI extraído de um chunk de texto, contendo o nome do KPI, seu valor numérico, unidade de medida, período fiscal a que se refere, e a página do relatório de onde foi extraído, se disponível."""
@@ -8,11 +8,11 @@ class KPI(BaseModel):
     value: float = Field(description="Valor numérico do KPI, já convertido para um formato numérico, ex: 1.5M -> 1500000.0")
     unit: Literal["BRL", "USD", "percent", "ratio", "units"] = Field(description="Unidade do KPI, ex: BRL para valores monetários, % para margens, units para contagens")
     period: str = Field(description="Período fiscal a que o KPI se refere, ex: '2023-Q4', '2023', '2023-Q1', etc.")
-    page_source: int | None = Field(description="Número da página do relatório de onde o KPI foi extraído, se disponível")
+    page_source: int | None = Field(default=None, description="Número da página do relatório de onde o KPI foi extraído, se disponível")
 
-    @field_validator("nome")
+    @field_validator("name")
     @classmethod
-    def normalize_nome(cls, v: str) -> str:
+    def normalize_name(cls, v: str) -> str:
         return v.strip().title()
     
 class Source(BaseModel):
@@ -29,3 +29,9 @@ class FinancialAnalysis(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0, description="Nível de confiança do agente na resposta gerada, baseado na relevância dos chunks recuperados e na consistência dos KPIs extraídos, expresso como um valor entre 0.0 (sem confiança) e 1.0 (confiança total).")
     need_more_context: bool = False
     ratio: str | None = Field(default=None, description="Explicação Opcional em como o agente chegou aquela resposta baseada nos KPIs extraídos, útil para análise e debugging do processo de raciocínio do agente.")
+
+    @model_validator(mode="after")
+    def sources_required(self) -> "FinancialAnalysis":
+        if not self.sources:
+            raise ValueError("sources must contain at least one entry")
+        return self
