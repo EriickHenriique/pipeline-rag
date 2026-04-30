@@ -7,9 +7,13 @@ requires-python = ">=3.13"
 dependencies = [
     "docling[ocr]>=2.90.0",
     "easyocr>=1.7.2",
+    "fastembed>=0.8.0",
     "loguru>=0.7.3",
+    "openai>=2.33.0",
     "pytest>=9.0.3",
+    "qdrant-client>=1.17.1",
     "rapidocr-onnxruntime>=1.4.4",
+    "tenacity>=9.1.4",
 ]
 
 [build-system]

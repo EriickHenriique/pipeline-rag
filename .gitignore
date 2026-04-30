@@ -218,3 +218,5 @@ data/processed/*
 !data/processed/.gitkeep
 *.ipynb_checkpoints
 .ipynb_checkpoints/
+notebook/
+
