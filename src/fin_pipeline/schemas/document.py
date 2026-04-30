@@ -71,18 +71,18 @@ class Chunk(BaseModel):
         }
 
     @classmethod
-    def payload_indexes(cls) -> list[str]:
-        """Retorna a lista de chaves do payload que devem ser indexadas no Qdrant."""
-        return [
-            "text",
-            "page_number",
-            "section",
-            "chunk_type",
-            "nome_empresa",
-            "cnpj",
-            "ticker",
-            "tipo_relatorio",
-            "ano_fiscal",
-            "trimestre",
-            "ano_publicacao"
-        ]  
+    def payload_indexes(cls) -> dict[str, str]:
+        """Retorna um dict mapeando campo → tipo de índice Qdrant ('keyword' ou 'integer')."""
+        return {
+            "text": "keyword",
+            "page_number": "integer",
+            "section": "keyword",
+            "chunk_type": "keyword",
+            "nome_empresa": "keyword",
+            "cnpj": "keyword",
+            "ticker": "keyword",
+            "tipo_relatorio": "keyword",
+            "ano_fiscal": "integer",
+            "trimestre": "integer",
+            "ano_publicacao": "keyword",
+        }

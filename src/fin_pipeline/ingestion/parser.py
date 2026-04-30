@@ -18,7 +18,7 @@ class DFPParser:
         pipeline_options.table_structure_options.do_cell_matching = True
 
         self.converter = DocumentConverter(
-            format_option={
+            format_options={
                 InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
             }
         )

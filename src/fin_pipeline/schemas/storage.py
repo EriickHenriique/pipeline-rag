@@ -16,7 +16,7 @@ class EmbeddedChunk(BaseModel):
 
     # Vetores sparse BM25 para recuperação baseada em palavras-chave, onde sparse_indices contém os índices das palavras-chave
     #  relevantes e sparse_values contém os valores correspondentes de relevância para cada índice.
-    sparse_indices: list[float] = Field(
+    sparse_indices: list[int] = Field(
         description="BM25 sparse vector indices"
     )
 
@@ -33,15 +33,15 @@ class EmbeddedChunk(BaseModel):
                 f"Sparse indices ({len(self.sparse_indices)}) e valores: ({len(self.sparse_values)}) devem ter o mesmo comprimento"
             )
         
-class IndexingStats(BaseException):
-    """Modelo de dados para as estatísticas do processo de indexação dos chunks no Qdrant, 
+class IndexingStats(BaseModel):
+    """Modelo de dados para as estatísticas do processo de indexação dos chunks no Qdrant,
     contendo o número total de chunks processados, o número de chunks que foram indexados com sucesso,
-    o número de chunks que falharam durante o processamento ou indexação, 
+    o número de chunks que falharam durante o processamento ou indexação,
     o nome da coleção no Qdrant onde os chunks foram indexados, e a duração total do processo de indexação em segundos."""
-    total_chunk: int = Field(description="Número total de chunks processados para indexação")
+    total_chunks: int = Field(description="Número total de chunks processados para indexação")
     successful: int = Field(description="Número de chunks que foram processados e indexados com sucesso")
     failed: int = Field(description="Número de chunks que falharam durante o processamento ou indexação, seja por erros de processamento, erros de comunicação com o Qdrant, ou rejeição de chunks pelo Qdrant devido a limitações de tamanho ou conteúdo inadequado.")
-    colection_name: str = Field(description="Nome da coleção no Qdrant onde os chunks foram indexados")
+    collection_name: str = Field(description="Nome da coleção no Qdrant onde os chunks foram indexados")
     duration_seconds: float = Field(description="Duração total do processo de indexação, desde o início do processamento dos chunks até a confirmação de que todos os chunks foram indexados ou falharam, expresso em segundos.")
 
     @property
@@ -49,6 +49,6 @@ class IndexingStats(BaseException):
         """Calcula a taxa de sucesso do processo de indexação, dividindo o número de chunks bem-sucedidos
           pelo número total de chunks processados, e retornando o resultado como um valor entre 0.0 (sem sucesso)
            e 1.0 (sucesso total). Se nenhum chunk foi processado, retorna 0.0 para evitar divisão por zero."""
-        if self.total_chunk == 0:
+        if self.total_chunks == 0:
             return 0.0
-        return self.successful / self.total_chunk
+        return self.successful / self.total_chunks

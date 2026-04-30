@@ -21,22 +21,21 @@ from fin_pipeline.schemas.storage import EmbeddedChunk, IndexingStats
 UPLOAD_BATCH_SIZE = 64
 
 
-class qdrantIndexer():
+class QdrantIndexer():
     """Classe responsável por gerenciar a indexação de chunks no Qdrant, incluindo criação de coleção, upload de dados e obtenção de estatísticas."""
     def __init__(self):
         """Inicializa o cliente do Qdrant e define a coleção a ser usada."""
         settings = get_settings()
-        self.client = QdrantClient(
+        self._client = QdrantClient(
             url=settings.qdrant_url,
             api_key=settings.qdrant_api_key.get_secret_value(),
             timeout=60
         )
         self.collection = settings.qdrant_collection
-    
+
     @property
     def client(self) -> QdrantClient:
-        """Retorna o cliente do Qdrant."""
-        return self.client
+        return self._client
     
     def collection_exists(self) -> bool:
         """Verifica se a coleção existe no Qdrant."""
@@ -56,8 +55,8 @@ class qdrantIndexer():
         logger.info(f"Criando coleção '{self.collection}'...")
 
         # Configuração da coleção para suportar busca híbrida, com vetores densos e esparsos, e índices de payload para os campos relevantes dos chunks.
-        self._client.create_collection(
-            collection_name=self._collection,
+        self.client.create_collection(
+            collection_name=self.collection,
             vectors_config={
                 "dense": VectorParams(
                     size=3072,
@@ -100,7 +99,7 @@ class qdrantIndexer():
         if not embedded_chunks:
             return IndexingStats(
                 total_chunks=0, successful=0, failed=0,
-                collection_name=self._collection, duration_seconds=0.0
+                collection_name=self.collection, duration_seconds=0.0
             )
     
         if not self.collection_exists():
@@ -161,8 +160,8 @@ class qdrantIndexer():
                         ),
                     },
                     payload={
-                        "chunk_id": ec.chunk.id,
-                        **ec.chunk.to_qdrant_payload(),
+                        "chunk_id": ec.chunk.chunk_id,
+                        **ec.chunk.qdrant_payload(),
                     },
                 )
             )
@@ -174,7 +173,7 @@ class qdrantIndexer():
         # Obter informações da coleção para calcular estatísticas relevantes, como número total de vetores, vetores indexados e status da coleção.
         info = self.client.get_collection(collection_name=self.collection)
         return {
-            "name": self._collection,
+            "name": self.collection,
             "vectors_count": info.points_count,
             "indexed_vectors_count": info.indexed_vectors_count,
             "status": info.status,

@@ -18,13 +18,32 @@ def detect_section(text: str) -> DocumentSection:
 
     text_upper = text.upper()
 
+    # Regras de detecção baseadas em palavras-chave para cada seção do documento, onde cada seção é associada a um conjunto de palavras-chave que são verificadas no texto para determinar a qual seção ele pertence. Se nenhuma palavra-chave for encontrada, o texto é classificado como "Outros".
     rules = {
-        DocumentSection.DRE: ["RESULTADO", "DRE", "RECEITA", "LUCRO", "EBITDA"],
-        DocumentSection.BALANCO: ["BALANÇO", "ATIVO", "PASSIVO", "PATRIMÔNIO"],
-        DocumentSection.DFC: ["FLUXO DE CAIXA", "DFC", "ATIVIDADES OPERACIONAIS"],
-        DocumentSection.DMPL: ["PATRIMÔNIO LÍQUIDO", "DMPL", "MUTAÇÕES"],
-        DocumentSection.NOTAS: ["NOTA EXPLICATIVA", "NOTA ", "POLÍTICAS CONTÁBEIS"],
-        DocumentSection.RELATORIO: ["RELATÓRIO", "MENSAGEM", "DESEMPENHO"]
+        DocumentSection.DRE: [
+            "RESULTADO", "DRE", "RECEITA", "LUCRO", "EBITDA", "EBIT", 
+            "CUSTO", "DESPESA", "OPERACIONAL", "FINANCEIRO", "CPV", "MARGEM"
+        ],
+        DocumentSection.BALANCO: [
+            "BALANÇO", "ATIVO", "PASSIVO", "PATRIMÔNIO", "CIRCULANTE", 
+            "NÃO CIRCULANTE", "IMOBILIZADO", "INTANGÍVEL", "ESTOQUES"
+        ],
+        DocumentSection.DFC: [
+            "FLUXO DE CAIXA", "DFC", "ATIVIDADES OPERACIONAIS", 
+            "INVESTIMENTO", "FINANCIAMENTO", "MÉTODO DIRETO", "MÉTODO INDIRETO"
+        ],
+        DocumentSection.DMPL: [
+            "PATRIMÔNIO LÍQUIDO", "DMPL", "MUTAÇÕES", "LUCROS ACUMULADOS", 
+            "RESERVAS", "CAPITAL SOCIAL", "ADJUSTES DE AVALIAÇÃO"
+        ],
+        DocumentSection.NOTAS: [
+            "NOTA EXPLICATIVA", "NOTAS EXPLICATIVAS", "POLÍTICAS CONTÁBEIS", 
+            "CONTEXTO OPERACIONAL", "APRESENTAÇÃO DAS DEMONSTRAÇÕES"
+        ],
+        DocumentSection.RELATORIO: [
+            "RELATÓRIO", "MENSAGEM", "DESEMPENHO", "ADMINISTRAÇÃO", 
+            "DIRETORIA", "PANORAMA", "COMENTÁRIOS DOS ADMINISTRADORES"
+        ]
     }
 
     for section, keywords in rules.items():
@@ -60,7 +79,7 @@ class DFPChunker:
     # Inicializa o chunker com os parâmetros de tamanho e sobreposição, convertendo os valores de tokens para caracteres com base
     # em uma média de caracteres por token, para garantir que os chunks gerados estejam dentro dos limites definidos e que haja uma sobreposição adequada entre eles.
     def __init__(self, chunk_size: int = TEXT_CHUNK_SIZE, chunk_overlap: int = TEXT_CHUNK_OVERLAP):
-        self.chunk_size = chunk_size * CHARS_PER_TOKEN
+        self.chunk_size_chars = chunk_size * CHARS_PER_TOKEN
         self.overlap = chunk_overlap * CHARS_PER_TOKEN
 
     # Processa as tabelas extraídas do documento, criando chunks específicos para cada tabela, e associando metadados relevantes
@@ -84,9 +103,9 @@ class DFPChunker:
         """Constrói um cabeçalho para cada chunk, contendo informações relevantes como o nome da empresa, tipo de relatório, 
         ano fiscal, seção do documento e número da página, para facilitar a identificação e organização dos chunks gerados."""
         return (
-            f"[{metadata.company_name} | "
-            f"{metadata.report_type.value} {metadata.fiscal_year} "
-            f"{metadata.quarter} | "
+            f"[{metadata.nome_empresa} | "
+            f"{metadata.tipo_relatorio.value} {metadata.ano_fiscal} "
+            f"{metadata.trimestre} | "
             f"Seção: {section.value} | Página: {page}]\n\n"
         )
     
@@ -136,11 +155,11 @@ class DFPChunker:
             if page_match:
                 current_page = int(page_match.group(1))
             
-            for part in split_text(section_text, self.chunk_size_chars, self.overlap_chars):
+            for part in split_text(section_text, self.chunk_size_chars, self.overlap):
                 if len(part.strip()) < 51:
                     continue
 
-                enriched_text = self._build_header(metadata, current_section, current_page) + part
+                enriched_text = self.build_header(metadata, current_section, current_page) + part
 
                 chunks.append(Chunk(
                     chunk_id=str(uuid.uuid4()),
