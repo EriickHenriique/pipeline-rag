@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -39,26 +40,39 @@ class DFPParser:
             logger.error(f"Erro ao processar o PDF {pdf_path}: {e}")
             raise e
         
-        # Exporta o conteúdo do PDF para markdown, que pode ser útil para análises baseadas em texto, e armazena as tabelas 
-        # extraídas em formato de dicionário, incluindo a página de origem e a representação em markdown da tabela
         markdown = doc.export_to_markdown()
-   
-        # Itera sobre as tabelas extraídas do PDF e armazena seu conteúdo em formato de dicionário, incluindo a página de origem, 
-        # o conteúdo da tabela em formato de lista de registros, e a representação em markdown da tabela
-        tables = []        
+
+        tables = []
         for table in doc.tables:
             tables.append({
                 "page": table.prov[0].page_no if table.prov else None,
                 "content": table.export_to_dataframe().to_dict(orient="records"),
                 "markdown": table.export_to_markdown()
             })
-        
+
         logger.info(f"Extração de tabelas concluída para o PDF: {pdf_path}, total de tabelas extraídas: {len(tables)}")
 
-        # 
+        # Extrai texto agrupado por página usando a estrutura nativa do Docling.
+        # Cada TextItem já sabe em qual página está via item.prov[0].page_no — sem heurísticas.
+        page_texts: dict[int, list[str]] = defaultdict(list)
+        for text_item in doc.texts:
+            if not text_item.text or not text_item.text.strip():
+                continue
+            if not text_item.prov:
+                continue
+            page_no = text_item.prov[0].page_no
+            page_texts[page_no].append(text_item.text.strip())
+
+        pages = [
+            {"page_no": pn, "text": "\n\n".join(texts)}
+            for pn, texts in sorted(page_texts.items())
+        ]
+        logger.info(f"Extração de texto por página concluída: {len(pages)} páginas com conteúdo.")
+
         return {
             "markdown": markdown,
             "tables": tables,
+            "pages": pages,
             "page_count": len(doc.pages),
             "raw_doc": doc
         }
