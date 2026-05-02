@@ -23,5 +23,10 @@ class ValidationResult(BaseModel):
     sources_check_passed: bool = True
     kpis_check_passed: bool = True
 
+    @property
+    def is_valid(self) -> bool:
+        """Propriedade para verificar se a resposta é considerada válida com base no veredicto da validação."""
+        return self.verdict == ValidationVerdict.PASS
+
 
 
