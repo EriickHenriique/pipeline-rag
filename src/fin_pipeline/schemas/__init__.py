@@ -13,6 +13,11 @@ from fin_pipeline.schemas.query import (
 )
 from fin_pipeline.schemas.state import AgentState
 
+from fin_pipeline.schemas.validation import (
+    ValidationResult,
+    ValidationIssue,
+    ValidationVerdict,
+)
 __all__ = [
 
     "DFPMetadata",
@@ -30,4 +35,8 @@ __all__ = [
     "Source",
 
     "AgentState",
+
+    "ValidationResult",
+    "ValidationIssue",
+    "ValidationVerdict",    
 ]

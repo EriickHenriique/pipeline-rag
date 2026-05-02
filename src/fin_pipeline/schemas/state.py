@@ -3,6 +3,7 @@ from typing import Annotated, TypedDict
 
 from fin_pipeline.schemas.analysis import FinancialAnalysis
 from fin_pipeline.schemas.query import QueryPlan, RetrievedChunk
+from fin_pipeline.schemas.validation import ValidationResult
 
 class AgentState(TypedDict):
     """Estado do agente durante o processo de análise financeira, contendo a pergunta original do usuário, 

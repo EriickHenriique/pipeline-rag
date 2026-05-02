@@ -8,6 +8,7 @@ dependencies = [
     "docling[ocr]>=2.90.0",
     "easyocr>=1.7.2",
     "fastembed>=0.8.0",
+    "langchain-openai>=1.2.1",
     "loguru>=0.7.3",
     "openai>=2.33.0",
     "pytest>=9.0.3",
