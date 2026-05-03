@@ -12,7 +12,7 @@ from fin_pipeline.schemas.validation import (
 # financeira, seguindo critérios específicos de avaliação e fornecendo feedback detalhado sobre quaisquer problemas identificados.
 # O prompt é estruturado para garantir que o agente de validação produza uma avaliação rigorosa, baseada em evidências
 # e bem fundamentada nos dados disponíveis.
-MIN_CONFIDENCE = 0.5
+MIN_CONFIDENCE = 0.4
 MIN_SOURCES = 1
 MAX_RETRIES = 3
 

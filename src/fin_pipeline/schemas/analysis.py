@@ -32,6 +32,6 @@ class FinancialAnalysis(BaseModel):
 
     @model_validator(mode="after")
     def sources_required(self) -> "FinancialAnalysis":
-        if not self.sources:
-            raise ValueError("sources must contain at least one entry")
+        if not self.need_more_context and not self.sources:
+            raise ValueError("Fonte dos KPIs é obrigatória quando a resposta não indica necessidade de mais contexto.")
         return self

@@ -1,4 +1,4 @@
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from loguru import logger
 
 from fin_pipeline.agents.base import BaseAgent
@@ -15,8 +15,8 @@ FINANCIAL_ANALYST_PROMPT = """"
 
     REGRAS CRÍTICAS:
     1. Use SOMENTE informações presentes nos trechos. Nunca invente dados.
-    2. Se a informação não está nos trechos, diga claramente que não foi encontrada.
-    3. Sempre cite a fonte: cada fato relevante deve ter um chunk_id de origem.
+    2. Se a informação não está nos trechos, diga claramente que não foi encontrada, defina need_more_context=True, sources=[] e confidence abaixo de 0.3.
+    3. Sempre cite a fonte: cada fato relevante deve ter um chunk_id de origem. Se need_more_context=False, sources DEVE conter ao menos uma entrada.
     4. Para KPIs (EBITDA, Lucro Líquido, etc.), extraia: nome, valor, unidade (BRL/USD/percent), período.
     5. Atribua um confidence_score de 0.0 a 1.0:
     - 0.9-1.0: resposta direta encontrada no contexto
@@ -44,8 +44,8 @@ class FinancialAnalystAgent(BaseAgent):
     """Agente de análise financeira especializado em DFPs brasileiras, que processa os trechos recuperados"""
     def __init__(self):
         settings = get_settings()
-        self.model = OpenAI(
-            model=settings.openai_model,
+        self.model = ChatOpenAI(
+            model=settings.chat_model,
             temperature=0.2,
             api_key=settings.openai_api_key.get_secret_value()
         ).with_structured_output(FinancialAnalysis)
@@ -77,7 +77,7 @@ class FinancialAnalystAgent(BaseAgent):
         )
 
         # Invoca o modelo para gerar a análise financeira estruturada, que inclui a resposta em linguagem natural, os KPIs extraídos, as fontes dos KPIs, o nível de confiança e uma explicação opcional do raciocínio do agente.
-        analysis: FinancialAnalysis = self.llm.invoke(prompt)
+        analysis: FinancialAnalysis = self.model.invoke(prompt)
 
         logger.info(
             f"[{self.name}] Confidence={analysis.confidence:.2f} | "
@@ -92,8 +92,8 @@ class FinancialAnalystAgent(BaseAgent):
         for i, c in enumerate(chunks, 1):
             parts.append(
                 f"[Trecho {i} | chunk_id={c.chunk_id}"
-                f"| empresa={c.nome_empresa} | página={c.page}"
-                f"| ano={c.year} {c.trimestre} | seção={c.section}]\n{c.text}\n"
+                f"| empresa={c.nome_empresa} | página={c.page_number}"
+                f"| ano={c.ano_fiscal} {c.trimestre} | seção={c.section}]\n{c.text}\n"
             )
 
         return "\n".join(parts)

@@ -18,6 +18,8 @@ from fin_pipeline.schemas.validation import (
     ValidationIssue,
     ValidationVerdict,
 )
+
+
 __all__ = [
 
     "DFPMetadata",
@@ -38,5 +40,5 @@ __all__ = [
 
     "ValidationResult",
     "ValidationIssue",
-    "ValidationVerdict",    
+    "ValidationVerdict",
 ]

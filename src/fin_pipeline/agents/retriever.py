@@ -15,7 +15,7 @@ from fin_pipeline.schemas.query import QueryPlan, RetrievalFilters, RetrievedChu
 from fin_pipeline.storage.embedder import EmbeddingService
 from fin_pipeline.storage.qdrant_indexer import QdrantIndexer
 
-TOP_K = 5
+TOP_K = 10
 PREFETCH_LIMIT = 20
 
 class RetrieverAgent(BaseAgent):
@@ -43,7 +43,7 @@ class RetrieverAgent(BaseAgent):
 
         # Loga os vetores de consulta e os filtros para debug
         results = self._indexer.client.query_points(
-            collection_name=self._indexer.collection_name,
+            collection_name=self._indexer.collection,
             prefetch=[Prefetch(
                 query=dense_vector,
                 using="dense",
@@ -72,8 +72,8 @@ class RetrieverAgent(BaseAgent):
 
     def _embed_query(self, query_text: str) -> tuple[list[float], dict]:
         """Gera os vetores de consulta denso e esparso a partir do texto da pergunta reformulada."""
-        dense = self._embedder._embed_dense_batch([query_text])[0]
-        sparse_emb = self._embedder._embed_sparse_batch([query_text])[0]
+        dense = self._embedder.embed_dense_batch([query_text])[0]
+        sparse_emb = self._embedder.embed_sparse_batch([query_text])[0]
         return dense, {
             "indices": sparse_emb.indices.tolist(),
             "values": sparse_emb.values.tolist(),
@@ -91,27 +91,27 @@ class RetrieverAgent(BaseAgent):
                 )
             )
         
-        if filters.ano_fiscal:
+        if filters.anos_fiscais:
             conditions.append(
                 FieldCondition(
                     key="ano_fiscal",
-                    match=MatchAny(any=filters.ano_fiscal)
+                    match=MatchAny(any=filters.anos_fiscais)
                 )
             )
-        
-        if filters.trimestre:
+
+        if filters.trimestres:
             conditions.append(
                 FieldCondition(
                     key="trimestre",
-                    match=MatchAny(any=filters.trimestre)
+                    match=MatchAny(any=filters.trimestres)
                 )
             )
-        
-        if filters.secao:
+
+        if filters.sections:
             conditions.append(
                 FieldCondition(
-                    key="secao",
-                    match=MatchAny(any=filters.secao)
+                    key="section",
+                    match=MatchAny(any=filters.sections)
                 )
             )
         
@@ -136,7 +136,7 @@ class RetrieverAgent(BaseAgent):
                     nome_empresa=payload["nome_empresa"],
                     ano_fiscal=payload["ano_fiscal"],
                     trimestre=payload["trimestre"],
-                    section=payload["secao"],
+                    section=payload["section"],
                     page_number=payload["page_number"],
                     chunk_type=payload["chunk_type"],
                 )
