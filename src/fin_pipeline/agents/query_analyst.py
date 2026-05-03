@@ -38,9 +38,10 @@ QUERY_ANALYST_PROMPT = """
 """
 
 class QueryAnalystAgent(BaseAgent):
-
+    """Agente responsável por analisar a pergunta do usuário e extrair a intenção, filtros e KPIs esperados."""
     name = "query_analyst"
 
+    
     def __init__(self):
         settings = get_settings()
         self.llm = ChatOpenAI(
