@@ -12,7 +12,7 @@ class ValidationVerdict(str, Enum):
 class ValidationIssue(BaseModel):
     """Modelo para representar um problema identificado durante a validação, incluindo o campo específico da resposta que apresenta o problema e a gravidade do problema identificado."""
     field: str = Field(description="O campo específico da resposta que apresenta o problema identificado na validação.")
-    severity: str = Field(description="A gravidade do problema identificado, que pode ser classificada como 'low', 'medium' ou 'high'.")
+    severity: str = Field(description="A gravidade do problema identificado, que pode ser classificada como 'error'.")
     message: str = Field(description="Uma descrição detalhada do problema identificado na validação, explicando o que está errado ou o que precisa ser corrigido na resposta.")
 
 class ValidationResult(BaseModel):
