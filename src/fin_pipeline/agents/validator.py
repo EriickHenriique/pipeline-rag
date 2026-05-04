@@ -81,7 +81,10 @@ class ValidatorAgent(BaseAgent):
                 confidence_check_passed=confidence_ok,
                 sources_check_passed=sources_ok,
                 kpis_check_passed=kpis_ok
-                )
+                ),
+                "is_valid": True,
+                "final_answer": analysis,
+                "is_done": True,
             }
         
         elif retry_count >= MAX_RETRIES:
@@ -124,5 +127,5 @@ class ValidatorAgent(BaseAgent):
         return {
             "is_valid": False,
             "is_done": True,
-            "validation_erros": [f"{field}: {message}"]
+            "validation_errors": [f"{field}: {message}"]
         }

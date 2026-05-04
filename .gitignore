@@ -219,4 +219,7 @@ data/processed/*
 *.ipynb_checkpoints
 .ipynb_checkpoints/
 notebook/
-
+.vscode
+.vscode/
+.vscode/
+settings.json
