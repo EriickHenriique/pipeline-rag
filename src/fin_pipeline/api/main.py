@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from fin_pipeline.api.routes import documents, health, query
+from fin_pipeline.api.routes import documents, health, query, ingest
 from fin_pipeline.config import get_settings
 from fin_pipeline.graph import get_graph
 
@@ -51,6 +51,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router, tags=["Health"])
     app.include_router(query.router, tags=["Query"])
     app.include_router(documents.router, tags=["Documents"])
+    app.include_router(ingest.router, tags=["Ingest"])
 
 
     return app

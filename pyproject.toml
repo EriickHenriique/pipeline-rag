@@ -7,7 +7,9 @@ requires-python = ">=3.13"
 dependencies = [
     "docling[ocr]>=2.90.0",
     "easyocr>=1.7.2",
+    "fastapi>=0.136.1",
     "fastembed>=0.8.0",
+    "httpx>=0.28.1",
     "langchain>=0.3.0",
     "langchain-openai>=1.2.1",
     "langfuse>=4.5.1",
@@ -17,7 +19,9 @@ dependencies = [
     "pytest>=9.0.3",
     "qdrant-client>=1.17.1",
     "rapidocr-onnxruntime>=1.4.4",
+    "streamlit>=1.57.0",
     "tenacity>=9.1.4",
+    "uvicorn>=0.46.0",
 ]
 
 [build-system]

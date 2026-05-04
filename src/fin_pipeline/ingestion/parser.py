@@ -46,8 +46,8 @@ class DFPParser:
         for table in doc.tables:
             tables.append({
                 "page": table.prov[0].page_no if table.prov else None,
-                "content": table.export_to_dataframe().to_dict(orient="records"),
-                "markdown": table.export_to_markdown()
+                "content": table.export_to_dataframe(doc=doc).to_dict(orient="records"),
+                "markdown": table.export_to_markdown(doc=doc)
             })
 
         logger.info(f"Extração de tabelas concluída para o PDF: {pdf_path}, total de tabelas extraídas: {len(tables)}")

@@ -28,7 +28,7 @@ class DFPMetadata(BaseModel):
     tipo_relatorio: ReportType = Field(description="Tipo de relatório financeiro")
     ano_fiscal: int = Field(ge=2010, le=2030, description="Ano fiscal do relatório")
     trimestre: Literal[1, 2, 3, 4] | None = Field(default=None, description="Trimestre do relatório")
-    data_publicacao: datetime | None = Field(description="Data de publicação do relatório")
+    data_publicacao: datetime | None = Field(default=None, description="Data de publicação do relatório")
 
     # Validadores para normalização e validação dos campos
 
