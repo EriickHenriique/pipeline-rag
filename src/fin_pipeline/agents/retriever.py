@@ -1,3 +1,4 @@
+from langchain_core.runnables.config import RunnableConfig
 from loguru import logger
 from  qdrant_client.models import (
     FieldCondition,
@@ -26,7 +27,7 @@ class RetrieverAgent(BaseAgent):
         self._indexer = QdrantIndexer()
         self._embedder = EmbeddingService()
 
-    def run(self, state: AgentState) -> dict:
+    def run(self, state: AgentState, config: RunnableConfig | None = None) -> dict:
         """Agente responsável por realizar a busca vetorial no índice do Qdrant, utilizando o plano de consulta gerado pelo QueryAnalystAgent."""
 
         # Recupera o plano de consulta do estado do agente

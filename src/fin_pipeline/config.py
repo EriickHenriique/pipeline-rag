@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -27,9 +27,13 @@ class Settings(BaseSettings):
     qdrant_collection: str = "documents_chunks"
 
     # LangFuse
-    langfuse_public_key: SecretStr
-    langfuse_secret_key: SecretStr
-    langfuse_host: str = "https://cloud.langfuse.com"
+    langfuse_enabled: bool = True
+    langfuse_public_key: SecretStr | None = None
+    langfuse_secret_key: SecretStr | None = None
+    langfuse_host: str = Field(
+        default="https://cloud.langfuse.com",
+        validation_alias=AliasChoices("langfuse_base_url", "langfuse_host"),
+    )
 
     # App
     app_env: Literal["development", "production"] = "development"

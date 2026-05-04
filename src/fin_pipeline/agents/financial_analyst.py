@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from loguru import logger
-
+from langchain_core.runnables.config import RunnableConfig
 from fin_pipeline.agents.base import BaseAgent
 from fin_pipeline.config import get_settings
 from fin_pipeline.schemas.analysis import FinancialAnalysis
@@ -50,13 +50,13 @@ class FinancialAnalystAgent(BaseAgent):
             api_key=settings.openai_api_key.get_secret_value()
         ).with_structured_output(FinancialAnalysis)
     
-    def run(self, state: AgentState) -> dict:
+    def run(self, state: AgentState, config: RunnableConfig | None = None) -> dict:
         """Executa o agente de análise financeira, processando os chunks recuperados e gerando uma resposta estruturada com base no prompt definido."""
         plan = state["query_plan"]
         chunks: list[RetrievedChunk] = state["retrieved_chunks"]
 
         if not chunks:
-            logger.warning(f"[{self.name}] não encontrou chunks para a query: {state['query']}")
+            logger.warning(f"[{self.name}] não encontrou chunks para a query: {state['user_query']}")
             return {
                 "draft_analysis": FinancialAnalysis(
                     answer="Não foi possível encontrar informações relevantes para responder à pergunta.",
@@ -77,7 +77,7 @@ class FinancialAnalystAgent(BaseAgent):
         )
 
         # Invoca o modelo para gerar a análise financeira estruturada, que inclui a resposta em linguagem natural, os KPIs extraídos, as fontes dos KPIs, o nível de confiança e uma explicação opcional do raciocínio do agente.
-        analysis: FinancialAnalysis = self.model.invoke(prompt)
+        analysis: FinancialAnalysis = self.model.invoke(prompt, config=config)
 
         logger.info(
             f"[{self.name}] Confidence={analysis.confidence:.2f} | "

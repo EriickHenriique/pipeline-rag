@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from loguru import logger
-
+from langchain_core.runnables.config import RunnableConfig
 from fin_pipeline.agents.base import BaseAgent
 from fin_pipeline.config import get_settings
 from fin_pipeline.schemas.query import QueryPlan
@@ -50,11 +50,11 @@ class QueryAnalystAgent(BaseAgent):
             api_key=settings.openai_api_key.get_secret_value(),
         ).with_structured_output(QueryPlan)
     
-    def run(self, state: AgentState) -> dict:
+    def run(self, state: AgentState, config: RunnableConfig | None = None) -> dict:
         logger.info(f"[{self.name}] Analisando: {state['user_query']}")
 
         prompt = QUERY_ANALYST_PROMPT.format(query=state['user_query'])
-        plan: QueryPlan = self.llm.invoke(prompt)
+        plan: QueryPlan = self.llm.invoke(prompt, config=config)
 
         plan.query_original = state['user_query']
 
