@@ -2,6 +2,8 @@
 
 Pipeline de Recuperação e Geração Aumentada (RAG) para análise de relatórios financeiros brasileiros (DFPs, ITRs e Releases). Permite fazer upload de PDFs de demonstrações financeiras e consultar o conteúdo via linguagem natural, com extração automática de KPIs e citação de fontes.
 
+![Pipeline RAG — Analista Financeiro](img/ai-engineering-pipeline.png)
+
 ---
 
 ## Visão Geral
@@ -179,6 +181,14 @@ A UI estará disponível em `http://localhost:8501`.
 
 ---
 
+## Testes
+
+```bash
+uv run pytest
+```
+
+---
+
 ## Endpoints da API
 
 | Método | Endpoint | Descrição |
@@ -200,12 +210,57 @@ curl -X POST http://localhost:8000/ingest \
   -F "trimestre=4"
 ```
 
+Resposta:
+
+```json
+{
+  "nome_empresa": "PETROBRAS",
+  "ano_fiscal": 2024,
+  "trimestre": 4,
+  "total_chunks": 143,
+  "table_chunks": 31,
+  "text_chunks": 112,
+  "processing_time_ms": 18420,
+  "collection_name": "dfp-chunks",
+  "success": true,
+  "message": "Documento indexado com sucesso."
+}
+```
+
 ### Exemplo: Consulta via curl
 
 ```bash
 curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
   -d '{"question": "Qual foi o EBITDA da Petrobras no 4T2024?", "session_id": "sess-01"}'
+```
+
+Resposta:
+
+```json
+{
+  "answer": "O EBITDA da Petrobras no 4T2024 foi de R$ 58,3 bilhões, representando uma margem de 47% sobre a receita líquida.",
+  "kpis": [
+    {
+      "name": "Ebitda",
+      "value": 58300000000.0,
+      "unit": "BRL",
+      "period": "2024-Q4",
+      "source_page": 42
+    }
+  ],
+  "sources": [
+    {
+      "page": 42,
+      "section": "DRE",
+      "chunk_id": "petrobras-dfp-2024-p42-001"
+    }
+  ],
+  "confidence": 0.87,
+  "need_more_context": false,
+  "reasoning": null,
+  "processing_time_ms": 3240
+}
 ```
 
 ---
@@ -301,4 +356,6 @@ src/fin_pipeline/
 | Langfuse | ≥4.5 | Observabilidade LLM |
 | Loguru | ≥0.7 | Logging |
 | Pydantic | — | Validação de dados |
+| tenacity | ≥9.1 | Retry com backoff em chamadas externas |
+| httpx | ≥0.28 | Cliente HTTP assíncrono |
 | uv | — | Gerenciamento de pacotes |
